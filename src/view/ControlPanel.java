@@ -3,8 +3,6 @@ package view;
 import model.Node;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 
 public class ControlPanel extends JToolBar {
@@ -54,15 +52,11 @@ public class ControlPanel extends JToolBar {
         this.add(new JButton(matrix));
         JSpinner js = new JSpinner();
         js.setModel(new SpinnerNumberModel(GraphPanel.RADIUS, 5, 100, 5));
-        js.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                JSpinner s = (JSpinner) e.getSource();
-                graphPanel.radius = (Integer) s.getValue();
-                Node.updateRadius(graphPanel.nodes, graphPanel.radius);
-                graphPanel.repaint();
-            }
+        js.addChangeListener(e -> {
+            JSpinner s = (JSpinner) e.getSource();
+            graphPanel.radius = (Integer) s.getValue();
+            Node.updateRadius(graphPanel.nodes, graphPanel.radius);
+            graphPanel.repaint();
         });
         this.add(new JLabel("Size:"));
         this.add(js);

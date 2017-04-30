@@ -10,8 +10,9 @@ import static view.GraphPanel.RADIUS;
  */
 public class Edge implements Serializable {
 
-    private Node n1;
-    private Node n2;
+    protected Node n1;
+    protected Node n2;
+    protected int weight;
 
     public Edge(Node n1, Node n2) {
         this.n1 = n1;
@@ -31,6 +32,7 @@ public class Edge implements Serializable {
         Point p2 = n2.getLocation();
         g.setColor(Color.darkGray);
         g.drawLine(p1.x, p1.y, p2.x, p2.y);
+        g.drawString("" + weight, (p1.x + p2.x) / 2 + 10, (p1.y + p2.y) / 2 + 10);
         double alpha = Math.atan((double) (p2.y - p1.y) / (double) (p2.x - p1.x));
         int k = p2.x < p1.x ? 1 : -1;
         int xn = p2.x + (int) (k * RADIUS * Math.cos(alpha));
@@ -43,5 +45,9 @@ public class Edge implements Serializable {
         int y2 = yn + (int) (k * r * Math.sin(alpha - angle));
         g.drawLine(xn, yn, x1, y1);
         g.drawLine(xn, yn, x2, y2);
+    }
+
+    public void setWeight(int weight) {
+        this.weight = weight;
     }
 }

@@ -10,23 +10,22 @@ import java.util.Collections;
 public class Node implements Serializable {
 
     public int n; //node number
-    private Point p;
-    private int r;
-    private Color color;
-    private Kind kind;
-    private boolean selected = false;
-    private Rectangle b = new Rectangle();
-    private long timeSelected;
+    protected Point p;
+    protected int r;
+    protected Color color;
+    protected boolean selected = false;
+    protected Rectangle b = new Rectangle();
+    protected long timeSelected;
+    protected int weight;
 
     /**
      * Construct a new node.
      */
-    public Node(int n, Point p, int r, Color color, Kind kind) {
+    public Node(int n, Point p, int r, Color color) {
         this.n = n;
         this.p = p;
         this.r = r;
         this.color = color;
-        this.kind = kind;
         setBoundary(b);
     }
 
@@ -130,15 +129,8 @@ public class Node implements Serializable {
         }
     }
 
-    /**
-     * Update each node's kind.
-     */
-    public static void updateKind(java.util.List<Node> list, Kind kind) {
-        for (Node n : list) {
-            if (n.isSelected()) {
-                n.kind = kind;
-            }
-        }
+    public int getN() {
+        return n;
     }
 
     /**
@@ -148,26 +140,26 @@ public class Node implements Serializable {
         b.setBounds(p.x - r, p.y - r, 2 * r, 2 * r);
     }
 
+    public void setWeight(int weight) {
+        this.weight = weight;
+    }
+
     /**
      * Draw this node.
      */
     public void draw(Graphics g) {
         g.setColor(this.color);
-        if (this.kind == Kind.Circular) {
-            Color curColor = g.getColor();
-            g.fillOval(b.x, b.y, b.width, b.height);
-            g.setColor(Color.BLACK);
-            g.setFont(new Font("Arial", Font.ROMAN_BASELINE, 25));
-            g.drawString("" + n, b.x + r - 5, b.y + r - 5);
-            g.setColor(curColor);
-        } else if (this.kind == Kind.Rounded) {
-            g.fillRoundRect(b.x, b.y, b.width, b.height, r, r);
-        } else if (this.kind == Kind.Square) {
-            g.fillRect(b.x, b.y, b.width, b.height);
-        }
+        Color curColor = g.getColor();
+        g.fillOval(b.x, b.y, b.width, b.height);
+        g.setColor(Color.BLACK);
+        g.setFont(new Font("Arial", Font.ROMAN_BASELINE, 25));
+        g.drawString("" + n, b.x + r - 5, b.y + r - 5);
+        g.drawLine(b.x, b.y + b.height / 2, b.x + b.width, b.y + b.height / 2);
+        g.drawString("" + weight, b.x + r - 5, b.y + r + 25);
+        g.setColor(curColor);
         if (selected) {
             g.setColor(Color.darkGray);
-            g.drawRect(b.x, b.y, b.width, b.height);
+            g.drawRect(b.x - 5, b.y - 5, b.width + 10, b.height + 10);
         }
     }
 

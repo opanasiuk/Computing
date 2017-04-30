@@ -8,10 +8,12 @@ public class BaseMenuBar extends JMenuBar {
     private JMenu fileMenu, editMenu, aboutMenu;
     private JMenuItem newMenuItem, saveMenuItem, loadMenuItem, exitMenuItem;
     private GraphPanel graphPanel;
+    private SystemTopologyPanel sysTopPanel;
 
-    BaseMenuBar(GraphPanel graphPanel) {
+    public BaseMenuBar(GraphPanel graphPanel, SystemTopologyPanel sysTopPanel) {
         super();
         this.graphPanel = graphPanel;
+        this.sysTopPanel = sysTopPanel;
         init();
         addComponents();
     }
@@ -19,8 +21,8 @@ public class BaseMenuBar extends JMenuBar {
     private void init() {
         fileMenu = new JMenu("File");
         newMenuItem = new JMenuItem(new Actions.ClearAction("New", graphPanel));
-        saveMenuItem = new JMenuItem(new Actions.SaveAction("Save", graphPanel));
-        loadMenuItem = new JMenuItem(new Actions.LoadAction("Load", graphPanel));
+        saveMenuItem = new JMenuItem(new Actions.SaveAction("Save", graphPanel, sysTopPanel));
+        loadMenuItem = new JMenuItem(new Actions.LoadAction("Open", graphPanel, sysTopPanel));
         exitMenuItem = new JMenuItem(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -29,7 +31,13 @@ public class BaseMenuBar extends JMenuBar {
         });
         exitMenuItem.setText("Exit");
         editMenu = new JMenu("Edit");
-        aboutMenu = new JMenu("About");
+        aboutMenu = new JMenu(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(graphPanel, "Author: Opanasiuk Oleksandr,\n IO-61m");
+            }
+        });
+        aboutMenu.setText("About");
     }
 
     private void addComponents() {

@@ -1,6 +1,7 @@
 package view;
 
 import model.Edge;
+import model.Kind;
 import model.Node;
 import mouse.MouseHandler;
 import mouse.MouseMotionHandler;
@@ -16,7 +17,6 @@ public class GraphPanel extends JComponent {
     public static final int HIGH = 480;
     public static final int RADIUS = 35;
     public ControlPanel control;// = new ControlPanel(this);
-    public BaseMenuBar menu;// = new BaseMenuBar(this);
     public int radius = RADIUS;
     public List<Node> nodes = new ArrayList<>();
     public List<Node> selected = new ArrayList<>();
@@ -24,6 +24,7 @@ public class GraphPanel extends JComponent {
     public Point mousePt = new Point(WIDE / 2, HIGH / 2);
     public Rectangle mouseRect = new Rectangle();
     public boolean selecting = false;
+    public Kind kind;
 
 
     public GraphPanel() {
@@ -31,7 +32,7 @@ public class GraphPanel extends JComponent {
         this.addMouseListener(new MouseHandler(this));
         this.addMouseMotionListener(new MouseMotionHandler(this));
         control = new ControlPanel(this);
-        menu = new BaseMenuBar(this);
+        kind = Kind.Circular;
     }
 
     @Override
@@ -55,4 +56,5 @@ public class GraphPanel extends JComponent {
                     mouseRect.width, mouseRect.height);
         }
     }
+
 }
