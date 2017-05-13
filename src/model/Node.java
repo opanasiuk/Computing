@@ -144,6 +144,10 @@ public class Node implements Serializable {
         this.weight = weight;
     }
 
+    public int getWeight() {
+        return weight;
+    }
+
     /**
      * Draw this node.
      */

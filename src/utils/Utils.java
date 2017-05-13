@@ -2,6 +2,7 @@ package utils;
 
 import model.Edge;
 import model.Node;
+import view.GraphPanel;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -40,6 +41,10 @@ public class Utils {
                 collect(Collectors.toCollection(LinkedList::new));
     }
 
+    public static boolean hasFreeNodes(GraphPanel panel) {
+        return getTrailingNodes(panel.nodes, panel.edges).size() > 0;
+    }
+
     public static boolean isCyclic(int[][] matrix) {
         Utils.matrix = matrix;
         Utils.color = new int[matrix.length];
@@ -72,6 +77,24 @@ public class Utils {
             }
         }
         color[n] = 2;
+    }
+
+    public static boolean hasFreeNodes0(GraphPanel panel) {
+        Utils.matrix = getMatrix(panel.nodes, panel.edges);
+        Utils.color = new int[matrix.length];
+        Utils.cyclic = false;
+
+        for (int i = 0; i < matrix.length; i++) {
+            dfs(i);
+        }
+        for (int i = 0; i < color.length; i++) {
+
+        }
+        return cyclic;
+    }
+
+    public static boolean isCyclic(GraphPanel panel) {
+        return isCyclic(getMatrix(panel.nodes, panel.edges));
     }
 
     public static int getFreeNumber(List<Node> nodes) {

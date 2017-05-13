@@ -10,26 +10,18 @@ public class ControlPanel extends JToolBar {
     public JButton btnNewNode;
     public ColorIcon hueIcon;
     public JPopupMenu popup;
-    private Action newNode;
-    private Action color;
-    private Action connect;
-    private Action delete;
-    private Action random;
-    private Action matrix;
-    private JButton btnConnect;
-    private JButton btnDelete;
 
     ControlPanel(GraphPanel graphPanel) {
-        delete = new Actions.DeleteAction("Delete", graphPanel);
-        connect = new Actions.ConnectAction("Connect", graphPanel);
-        color = new Actions.ColorAction("Color", graphPanel);
-        newNode = new Actions.NewNodeAction("New", graphPanel);
+        Action delete = new Actions.DeleteAction("Delete", graphPanel);
+        Action connect = new Actions.ConnectAction("Connect", graphPanel);
+        Action color = new Actions.ColorAction("Color", graphPanel);
+        Action newNode = new Actions.NewNodeAction("New", graphPanel);
         popup = new JPopupMenu();
-        random = new Actions.RandomAction("Random", graphPanel);
-        matrix = new Actions.GetMatrixAction("Matrix", graphPanel);
+        Action random = new Actions.RandomAction("Random", graphPanel);
+        Action freeNodes = new Actions.FreeNodesAction("FreeNodes", graphPanel);
         btnNewNode = new JButton(newNode);
-        btnConnect = new JButton(connect);
-        btnDelete = new JButton(delete);
+        JButton btnConnect = new JButton(connect);
+        JButton btnDelete = new JButton(delete);
         hueIcon = new ColorIcon(Color.blue);
 
         btnNewNode.setIcon(new ImageIcon("resources/icons/add_icon.png"));
@@ -46,22 +38,24 @@ public class ControlPanel extends JToolBar {
         this.add(btnNewNode);
         this.add(btnConnect);
         this.add(btnDelete);
-        this.addSeparator();
-        this.add(new JButton(color));
-        this.add(new JLabel(hueIcon));
-        this.add(new JButton(matrix));
-        JSpinner js = new JSpinner();
-        js.setModel(new SpinnerNumberModel(GraphPanel.RADIUS, 5, 100, 5));
-        js.addChangeListener(e -> {
-            JSpinner s = (JSpinner) e.getSource();
-            graphPanel.radius = (Integer) s.getValue();
-            Node.updateRadius(graphPanel.nodes, graphPanel.radius);
-            graphPanel.repaint();
-        });
-        this.add(new JLabel("Size:"));
-        this.add(js);
-        this.add(new JButton(random));
-
+        if (!(graphPanel instanceof SystemTopologyPanel)) {
+            this.addSeparator();
+            this.add(new JButton(color));
+            this.add(new JLabel(hueIcon));
+            JSpinner js = new JSpinner();
+            js.setModel(new SpinnerNumberModel(GraphPanel.RADIUS, 5, 100, 5));
+            js.addChangeListener(e -> {
+                JSpinner s = (JSpinner) e.getSource();
+                graphPanel.radius = (Integer) s.getValue();
+                Node.updateRadius(graphPanel.nodes, graphPanel.radius);
+                graphPanel.repaint();
+            });
+            this.add(new JLabel("Size:"));
+            this.add(js);
+            this.add(new JButton(random));
+        } else {
+            this.add(new JButton(freeNodes));
+        }
         popup.add(new JMenuItem(newNode));
         popup.add(new JMenuItem(color));
         popup.add(new JMenuItem(connect));

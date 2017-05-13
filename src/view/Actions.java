@@ -11,10 +11,9 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Random;
+import java.util.Queue;
 import java.util.stream.Collectors;
 
 /**
@@ -165,7 +164,7 @@ public class Actions {
                             ? new Connection(n1, n2) : new Edge(n1, n2);
                     edge.setWeight(weight);
                     edges.add(edge);
-                    if (graphPanel instanceof SystemTopologyPanel && Utils.isCyclic(Utils.getMatrix(nodes, edges))) {
+                    if (graphPanel instanceof GraphPanel && Utils.isCyclic(Utils.getMatrix(nodes, edges))) {
                         edges.remove(edge);
                         JOptionPane.showMessageDialog(graphPanel,
                                 "Graph must be acyclic");
@@ -227,7 +226,8 @@ public class Actions {
                 JOptionPane.showMessageDialog(graphPanel, "Wrong number!");
             }
             Node.selectNone(graphPanel.nodes);
-            Point p = graphPanel.mousePt.getLocation();
+            //Point p = graphPanel.mousePt.getLocation();
+            Point p = new Point(50, 50);
             Color color = graphPanel.control.hueIcon.getColor();
             Node n = isSystemTopologyMode
                     ? new Processor(Utils.getFreeNumber(graphPanel.nodes), p, graphPanel.radius, color)
@@ -269,26 +269,64 @@ public class Actions {
                 int minWeight = minWeightTxt.getText().isEmpty() ? 0 : Integer.parseInt(minWeightTxt.getText());
                 int maxWeight = maxWeightTxt.getText().isEmpty() ? 0 : Integer.parseInt(maxWeightTxt.getText());
                 int numOfNodes = numberOfNodesTxt.getText().isEmpty() ? 0 : Integer.parseInt(numberOfNodesTxt.getText());
-                int coef = coefCovallTxt.getText().isEmpty() ? 0 : Integer.parseInt(coefCovallTxt.getText());
+                double coef = coefCovallTxt.getText().isEmpty() ? 0 : Double.parseDouble(coefCovallTxt.getText());
+                graphPanel.nodes.clear();
+                graphPanel.edges.clear();
                 Random rnd = new Random();
+                int cx = GraphPanel.WIDE / 2;
+                int cy = GraphPanel.HIGH / 2;
+                int r = 180;
+                double angleDiff = 2 * Math.PI / (double) numOfNodes;
+                double angle = 0.0;
                 for (int i = 0; i < numOfNodes; i++) {
-                    Point p = new Point(rnd.nextInt(GraphPanel.WIDE), rnd.nextInt(GraphPanel.HIGH));
+                    Point p = new Point((int) (cx + r * Math.sin(angle)), (int) (cy - r * Math.cos(angle)));
+                    angle += angleDiff;
                     Node n = new Node(Utils.getFreeNumber(graphPanel.nodes),
-                            p, graphPanel.radius, new Color(rnd.nextInt()));
+                            p, graphPanel.radius, graphPanel.control.hueIcon.getColor());
                     n.setWeight(rnd.nextInt(maxWeight - minWeight + 1) + minWeight);
                     graphPanel.nodes.add(n);
                 }
+                int k = (int) (graphPanel.nodes.stream().map(Node::getWeight).reduce((n1, n2) -> n1 + n2).get()
+                        * (1.0 / coef - 1.0));
+                Queue<Integer> edgesWeight = new LinkedList<>();
+                int z = k;
+                while (k > 0) {
+                    int t = k > 20 ? k / 4 : k / 2;
+                    int rand = t + rnd.nextInt(t + 1);
+                    int weight = rand == 0 ? 1 : rand;
+                    weight = weight > k ? k : weight;
+                    edgesWeight.add(weight);
+                    k -= weight;
+                }
+                int executions = 0;
+                while (edgesWeight.size() > 0) {
+                    if (++executions > 100000) {
+                        JOptionPane.showMessageDialog(graphPanel, "Cant create graph try one more time!");
+                        return;
+                    }
+                    Node sourceNode = graphPanel.nodes.get(rnd.nextInt(numOfNodes));
+                    Node targetNode = graphPanel.nodes.get(rnd.nextInt(numOfNodes));
+                    if (graphPanel.edges.stream().filter(ed -> ed.getN1().equals(sourceNode))
+                            .filter(ed -> ed.getN2().equals(targetNode)).count() > 0 || sourceNode.equals(targetNode)) {
+                        continue;
+                    }
+                    int weight = edgesWeight.poll();
+                    graphPanel.edges.add(new Edge(sourceNode, targetNode, weight));
+                    if (Utils.isCyclic(graphPanel)) {
+                        graphPanel.edges.remove(graphPanel.edges.size() - 1);
+                        edgesWeight.add(weight);
+                    }
+                }
             }
-
             graphPanel.repaint();
         }
     }
 
-    public static class GetMatrixAction extends AbstractAction {
+    public static class FreeNodesAction extends AbstractAction {
 
         private GraphPanel graphPanel;
 
-        public GetMatrixAction(String name, GraphPanel graphPanel) {
+        public FreeNodesAction(String name, GraphPanel graphPanel) {
             super(name);
             this.graphPanel = graphPanel;
         }
@@ -297,6 +335,7 @@ public class Actions {
         public void actionPerformed(ActionEvent e) {
             java.util.List<Node> trailingNodes = Utils.getTrailingNodes(
                     graphPanel.nodes, graphPanel.edges);
+            Utils.getMatrix(graphPanel.nodes, graphPanel.edges);
             if (trailingNodes.size() > 0) {
                 StringBuilder messageText = new StringBuilder();
                 messageText.append("Graph has trailing node" + (trailingNodes.size() > 1 ? "s" : "") + ": ");
@@ -305,4 +344,6 @@ public class Actions {
             }
         }
     }
+
+
 }
