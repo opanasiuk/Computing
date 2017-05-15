@@ -53,6 +53,7 @@ public class ControlPanel extends JToolBar {
             this.add(new JLabel("Size:"));
             this.add(js);
             this.add(new JButton(random));
+            this.add(new JButton(new Actions.FreeNodesAction("Get Queues", graphPanel)));
         } else {
             this.add(new JButton(freeNodes));
         }

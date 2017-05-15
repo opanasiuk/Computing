@@ -4,6 +4,7 @@ import model.Connection;
 import model.Edge;
 import model.Node;
 import model.Processor;
+import utils.Path;
 import utils.Utils;
 
 import javax.swing.*;
@@ -14,7 +15,6 @@ import java.io.*;
 import java.util.*;
 import java.util.List;
 import java.util.Queue;
-import java.util.stream.Collectors;
 
 /**
  * Created by Кумпутер on 12.03.2017.
@@ -289,7 +289,6 @@ public class Actions {
                 int k = (int) (graphPanel.nodes.stream().map(Node::getWeight).reduce((n1, n2) -> n1 + n2).get()
                         * (1.0 / coef - 1.0));
                 Queue<Integer> edgesWeight = new LinkedList<>();
-                int z = k;
                 while (k > 0) {
                     int t = k > 20 ? k / 4 : k / 2;
                     int rand = t + rnd.nextInt(t + 1);
@@ -333,15 +332,18 @@ public class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            java.util.List<Node> trailingNodes = Utils.getTrailingNodes(
-                    graphPanel.nodes, graphPanel.edges);
-            Utils.getMatrix(graphPanel.nodes, graphPanel.edges);
-            if (trailingNodes.size() > 0) {
-                StringBuilder messageText = new StringBuilder();
-                messageText.append("Graph has trailing node" + (trailingNodes.size() > 1 ? "s" : "") + ": ");
-                messageText.append(trailingNodes.stream().map(n -> String.valueOf(n.getN())).collect(Collectors.joining(", ")));
-                JOptionPane.showMessageDialog(graphPanel, messageText);
-            }
+//            java.util.List<Node> trailingNodes = Utils.getTrailingNodes(
+//                    graphPanel.nodes, graphPanel.edges);
+//            Utils.getMatrix(graphPanel.nodes, graphPanel.edges);
+//            if (trailingNodes.size() > 0) {
+//                StringBuilder messageText = new StringBuilder();
+//                messageText.append("Graph has trailing node" + (trailingNodes.size() > 1 ? "s" : "") + ": ");
+//                messageText.append(trailingNodes.stream().map(n -> String.valueOf(n.getN())).collect(Collectors.joining(", ")));
+//                JOptionPane.showMessageDialog(graphPanel, messageText);
+//            }
+            Path p = new Path(graphPanel);
+            graphPanel.textArea.setText("Alg16: " + p.getQueueAlg16() + "\n");
+            graphPanel.repaint();
         }
     }
 

@@ -3,8 +3,6 @@ package model;
 import java.awt.*;
 import java.io.Serializable;
 
-import static view.GraphPanel.RADIUS;
-
 /**
  * Created by Кумпутер on 12.03.2017.
  */
@@ -41,8 +39,9 @@ public class Edge implements Serializable {
         g.drawString("" + weight, (p1.x + p2.x) / 2 + 10, (p1.y + p2.y) / 2 + 10);
         double alpha = Math.atan((double) (p2.y - p1.y) / (double) (p2.x - p1.x));
         int k = p2.x < p1.x ? 1 : -1;
-        int xn = p2.x + (int) (k * RADIUS * Math.cos(alpha));
-        int yn = p2.y + (int) (k * RADIUS * Math.sin(alpha));
+        int radius = n2.r;
+        int xn = p2.x + (int) (k * radius * Math.cos(alpha));
+        int yn = p2.y + (int) (k * radius * Math.sin(alpha));
         int r = 10;
         double angle = Math.PI / 6;
         int x1 = xn + (int) (k * r * Math.cos(alpha + angle));

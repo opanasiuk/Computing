@@ -79,7 +79,7 @@ public class Utils {
         color[n] = 2;
     }
 
-    public static boolean hasFreeNodes0(GraphPanel panel) {
+    public static boolean hasDontConnected(GraphPanel panel) {
         Utils.matrix = getMatrix(panel.nodes, panel.edges);
         Utils.color = new int[matrix.length];
         Utils.cyclic = false;
