@@ -13,12 +13,14 @@ import java.util.Arrays;
  * Created by Кумпутер on 12.03.2017.
  */
 public class SystemSoftware {
+    public static GraphPanel gp;
+    public static SystemTopologyPanel stp;
     public static void main(String[] args) throws Exception {
         EventQueue.invokeLater(() -> {
             JFrame f = new JFrame("GraphPanel");
             f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            GraphPanel gp = new GraphPanel();
-            SystemTopologyPanel stp = new SystemTopologyPanel();
+            stp = new SystemTopologyPanel();
+            gp = new GraphPanel();
             JPanel gpPanel = new JPanel(new BorderLayout());
             gpPanel.add(gp.control, BorderLayout.NORTH);
             gpPanel.add(new JScrollPane(gp));

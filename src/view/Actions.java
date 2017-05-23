@@ -4,6 +4,7 @@ import model.Connection;
 import model.Edge;
 import model.Node;
 import model.Processor;
+import utils.Modeling;
 import utils.Path;
 import utils.Utils;
 
@@ -156,7 +157,7 @@ public class Actions {
                     Node n1 = selected.get(i);
                     Node n2 = selected.get(i + 1);
                     try {
-                        weight = Integer.parseInt(JOptionPane.showInputDialog(graphPanel, message));
+                        weight = isSystemTopologyMode ? 1 : Integer.parseInt(JOptionPane.showInputDialog(graphPanel, message));
                     } catch (NumberFormatException ex) {
                         JOptionPane.showMessageDialog(graphPanel, "Wrong number!");
                     }
@@ -221,7 +222,8 @@ public class Actions {
             String message = isSystemTopologyMode ? "Input the processor productivity" : "Input the weight of node";
             int weight = 0;
             try {
-                weight = Integer.parseInt(JOptionPane.showInputDialog(graphPanel, message));
+                weight = isSystemTopologyMode ? 1
+                        : Integer.parseInt(JOptionPane.showInputDialog(graphPanel, message));
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(graphPanel, "Wrong number!");
             }
@@ -321,31 +323,33 @@ public class Actions {
         }
     }
 
+
+
     public static class FreeNodesAction extends AbstractAction {
 
         private GraphPanel graphPanel;
+        private SystemTopologyPanel sysPanel;
 
-        public FreeNodesAction(String name, GraphPanel graphPanel) {
+        private static final int DEFAULT_WIDTH = 600;
+        private static final int DEFAULT_HEIGHT = 400;
+
+        public FreeNodesAction(String name, GraphPanel graphPanel, SystemTopologyPanel sysPanel) {
             super(name);
             this.graphPanel = graphPanel;
+            this.sysPanel = sysPanel;
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-//            java.util.List<Node> trailingNodes = Utils.getTrailingNodes(
-//                    graphPanel.nodes, graphPanel.edges);
-//            Utils.getMatrix(graphPanel.nodes, graphPanel.edges);
-//            if (trailingNodes.size() > 0) {
-//                StringBuilder messageText = new StringBuilder();
-//                messageText.append("Graph has trailing node" + (trailingNodes.size() > 1 ? "s" : "") + ": ");
-//                messageText.append(trailingNodes.stream().map(n -> String.valueOf(n.getN())).collect(Collectors.joining(", ")));
-//                JOptionPane.showMessageDialog(graphPanel, messageText);
-//            }
-            Path p = new Path(graphPanel);
-            graphPanel.textArea.setText("Alg16: " + p.getQueueAlg16() + "\n");
-            graphPanel.repaint();
+            Frame fr = new JFrame("Modeling");
+            fr.setSize(DEFAULT_WIDTH + 20, DEFAULT_HEIGHT + 20);
+            JPanel gpPanel = new JPanel(new BorderLayout());
+            Modeling m = new Modeling(graphPanel, sysPanel,
+                    Path.CriteriaType.TIME_FROM_BEGIN);
+            GanttDiagram gd = new GanttDiagram(m.getResult());
+            fr.add(gpPanel.add(new JScrollPane(gd)));
+            fr.setVisible(true);
         }
     }
-
 
 }

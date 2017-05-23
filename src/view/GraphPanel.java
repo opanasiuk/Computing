@@ -3,7 +3,6 @@ package view;
 import model.Edge;
 import model.Kind;
 import model.Node;
-import model.QueueTextArea;
 import mouse.MouseHandler;
 import mouse.MouseMotionHandler;
 
@@ -26,13 +25,11 @@ public class GraphPanel extends JComponent {
     public Rectangle mouseRect = new Rectangle();
     public boolean selecting = false;
     public Kind kind;
-    public QueueTextArea textArea;
 
     public GraphPanel() {
         this.setOpaque(true);
         this.addMouseListener(new MouseHandler(this));
         this.addMouseMotionListener(new MouseMotionHandler(this));
-        this.textArea = new QueueTextArea(this);
         control = new ControlPanel(this);
         kind = Kind.Circular;
     }
@@ -57,8 +54,6 @@ public class GraphPanel extends JComponent {
             g.drawRect(mouseRect.x, mouseRect.y,
                     mouseRect.width, mouseRect.height);
         }
-        g.setColor(Color.BLACK);
-        textArea.draw(g);
     }
 
 }
