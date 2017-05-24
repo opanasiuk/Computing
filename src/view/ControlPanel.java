@@ -19,7 +19,7 @@ public class ControlPanel extends JToolBar {
         Action newNode = new Actions.NewNodeAction("New", graphPanel);
         popup = new JPopupMenu();
         Action random = new Actions.RandomAction("Random", graphPanel);
-        Action freeNodes = new Actions.FreeNodesAction("FreeNodes", graphPanel, SystemSoftware.stp);
+
         btnNewNode = new JButton(newNode);
         JButton btnConnect = new JButton(connect);
         JButton btnDelete = new JButton(delete);
@@ -55,9 +55,10 @@ public class ControlPanel extends JToolBar {
             this.add(js);
             this.add(new JButton(random));
 
-            this.add(new JButton(new Actions.FreeNodesAction("Get Result",
+            this.add(new JButton(new Actions.ModelingAction("Get Result",
                     graphPanel, SystemSoftware.stp)));
         } else {
+            Action freeNodes = new Actions.FreeNodesAction("FreeNodes", (SystemTopologyPanel) graphPanel);
             this.add(new JButton(freeNodes));
         }
         popup.add(new JMenuItem(newNode));

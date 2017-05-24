@@ -2,6 +2,7 @@ package utils;
 
 import model.Edge;
 import model.Node;
+import model.Processor;
 import view.GraphPanel;
 
 import java.util.*;
@@ -13,7 +14,7 @@ import java.util.stream.Collectors;
 public class Path {
     private List<Node> nodes;
     private List<Edge> edges;
-    private int [][] graph;
+    private int[][] graph;
 
     public Path(GraphPanel panel) {
         this.nodes = panel.nodes;
@@ -21,34 +22,34 @@ public class Path {
         this.graph = Utils.getMatrix(nodes, edges);
     }
 
-    public Path(int [][] a) {
+    public Path(int[][] a) {
         this.graph = a;
     }
 
-    public int [] getDistanceToNodes(CriteriaType type) {
-        int [] distances = new int[graph.length];
+    public int[] getDistanceToNodes(CriteriaType type) {
+        int[] distances = new int[graph.length];
         Arrays.fill(distances, -1);
         getFreeNodes(type).stream().forEach(index ->
                 distances[index] = (type == CriteriaType.TIME_FROM_END
                         ? nodes.get(index).getWeight() : 0));
-        while(isNotDone(distances)) {
+        while (isNotDone(distances)) {
             for (int i = 0; i < graph.length; i++) {
                 List<Integer> ch = type == CriteriaType.TIME_FROM_END
                         ? getParents(i) : getChilds(i);
                 ch.stream().filter(indexOfChild -> distances[indexOfChild] == -1)
                         .forEach(indexOfChild -> {
-                    int maxWeight = getMaxWeight(indexOfChild, distances, type);
-                    if (maxWeight != -1) {
-                        distances[indexOfChild] = maxWeight;
-                    }
-                });
+                            int maxWeight = getMaxWeight(indexOfChild, distances, type);
+                            if (maxWeight != -1) {
+                                distances[indexOfChild] = maxWeight;
+                            }
+                        });
             }
         }
         return distances;
     }
 
     private List<Pair> getQueue0(CriteriaType type) {
-        int [] distances = getDistanceToNodes(type);
+        int[] distances = getDistanceToNodes(type);
         List<Pair> queue = new ArrayList<>();
         for (int i = 0; i < distances.length; i++) {
             queue.add(new Pair(i, distances[i]));
@@ -90,11 +91,11 @@ public class Path {
         return res.toString();
     }
 
-    private boolean isNotDone(int [] a) {
+    private boolean isNotDone(int[] a) {
         return Arrays.stream(a).anyMatch(d -> d == -1);
     }
 
-    private int getMaxWeight(int n, int [] weight, CriteriaType type) {
+    private int getMaxWeight(int n, int[] weight, CriteriaType type) {
         List<Integer> nds = type == CriteriaType.NUMBER_OF_NODES
                 || type == CriteriaType.TIME_FROM_BEGIN ? getParents(n) : getChilds(n);
         int max = Integer.MIN_VALUE;
@@ -159,6 +160,37 @@ public class Path {
                 .sorted((e1, e2) -> e2.getValue() - e1.getValue())
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
+    }
+
+    public List<Processor> getMinPath(int from, int to) {
+        List<Processor> visited = new LinkedList<>();
+        Processor p = (Processor) nodes.get(from);
+        return dfs(p, (Processor) nodes.get(to), visited);
+    }
+
+    private List<Processor> dfs(Processor proc, Processor destiny,
+                                List<Processor> visited) {
+        if (proc.equals(destiny)) {
+            List<Processor> list = new LinkedList<>();
+            list.add(proc);
+            return list;
+        }
+        visited.add(proc);
+        List<Processor> currentPath = null;
+        for (Processor processor : proc.child) {
+            if (!visited.contains(processor)) {
+                List<Processor> path = dfs(processor, destiny, visited);
+                if (currentPath == null
+                        || (path != null && path.size() < currentPath.size())) {
+                    currentPath = path;
+                }
+            }
+        }
+        if (currentPath == null || currentPath.size() == 0) {
+            return null;
+        }
+        currentPath.add(proc);
+        return currentPath;
     }
 
     private static class Pair {

@@ -1,14 +1,14 @@
 package utils;
 
+import model.Connection;
 import model.Edge;
 import model.Node;
+import model.Processor;
 import view.GraphPanel;
+import view.SystemTopologyPanel;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Created by Кумпутер on 05.03.2017.
@@ -26,23 +26,27 @@ public class Utils {
             int n2Number = nodes.indexOf(edge.getN2());
             if (n1Number >= 0 && n2Number >= 0) {
                 matrix[n1Number][n2Number] = 1;
+                if (edge instanceof Connection) {
+                    matrix[n2Number][n1Number] = 1;
+                }
             }
         }
         return matrix;
     }
 
-    public static List<Node> getTrailingNodes(List<Node> nodes, List<Edge> edges) {
-        Set<Node> connectedNodes = new HashSet<>();
-        for (Edge edge : edges) {
-            connectedNodes.add(edge.getN1());
-            connectedNodes.add(edge.getN2());
-        }
-        return nodes.stream().filter(node -> !connectedNodes.contains(node)).
-                collect(Collectors.toCollection(LinkedList::new));
+    public static boolean hasFreeNodes(SystemTopologyPanel panel) {
+        List<Processor> visited = new LinkedList<>();
+        dfs((Processor) panel.nodes.get(0), visited);
+        return panel.nodes.size() != visited.size();
     }
 
-    public static boolean hasFreeNodes(GraphPanel panel) {
-        return getTrailingNodes(panel.nodes, panel.edges).size() > 0;
+    private static void dfs(Processor proc, List<Processor> visited) {
+        visited.add(proc);
+        for (Processor processor : proc.child) {
+            if (!visited.contains(processor)) {
+                dfs(processor, visited);
+            }
+        }
     }
 
     public static boolean isCyclic(int[][] matrix) {

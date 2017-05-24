@@ -156,6 +156,10 @@ public class Actions {
                 for (int i = 0; i < selected.size() - 1; ++i) {
                     Node n1 = selected.get(i);
                     Node n2 = selected.get(i + 1);
+                    if (n1 instanceof Processor && n2 instanceof Processor) {
+                        ((Processor) n1).child.add((Processor) n2);
+                        ((Processor) n2).child.add((Processor) n1);
+                    }
                     try {
                         weight = isSystemTopologyMode ? 1 : Integer.parseInt(JOptionPane.showInputDialog(graphPanel, message));
                     } catch (NumberFormatException ex) {
@@ -165,7 +169,8 @@ public class Actions {
                             ? new Connection(n1, n2) : new Edge(n1, n2);
                     edge.setWeight(weight);
                     edges.add(edge);
-                    if (graphPanel instanceof GraphPanel && Utils.isCyclic(Utils.getMatrix(nodes, edges))) {
+                    if (!(graphPanel instanceof SystemTopologyPanel)
+                            && Utils.isCyclic(Utils.getMatrix(nodes, edges))) {
                         edges.remove(edge);
                         JOptionPane.showMessageDialog(graphPanel,
                                 "Graph must be acyclic");
@@ -325,7 +330,7 @@ public class Actions {
 
 
 
-    public static class FreeNodesAction extends AbstractAction {
+    public static class ModelingAction extends AbstractAction {
 
         private GraphPanel graphPanel;
         private SystemTopologyPanel sysPanel;
@@ -333,7 +338,7 @@ public class Actions {
         private static final int DEFAULT_WIDTH = 600;
         private static final int DEFAULT_HEIGHT = 400;
 
-        public FreeNodesAction(String name, GraphPanel graphPanel, SystemTopologyPanel sysPanel) {
+        public ModelingAction(String name, GraphPanel graphPanel, SystemTopologyPanel sysPanel) {
             super(name);
             this.graphPanel = graphPanel;
             this.sysPanel = sysPanel;
@@ -346,9 +351,26 @@ public class Actions {
             JPanel gpPanel = new JPanel(new BorderLayout());
             Modeling m = new Modeling(graphPanel, sysPanel,
                     Path.CriteriaType.TIME_FROM_BEGIN);
-            GanttDiagram gd = new GanttDiagram(m.getResult());
+            GanttDiagram gd = new GanttDiagram(m);
             fr.add(gpPanel.add(new JScrollPane(gd)));
             fr.setVisible(true);
+        }
+    }
+
+    public static class FreeNodesAction extends AbstractAction {
+
+        private SystemTopologyPanel sysPanel;
+
+        public FreeNodesAction(String name, SystemTopologyPanel sysPanel) {
+            super(name);
+            this.sysPanel = sysPanel;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (Utils.hasFreeNodes(sysPanel)) {
+                JOptionPane.showMessageDialog(sysPanel, "Graph is not linked");
+            }
         }
     }
 

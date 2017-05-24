@@ -10,14 +10,14 @@ public class Edge implements Serializable {
 
     protected Node n1;
     protected Node n2;
-    protected double weight;
+    protected int weight;
 
     public Edge(Node n1, Node n2) {
         this.n1 = n1;
         this.n2 = n2;
     }
 
-    public Edge(Node n1, Node n2, double weight) {
+    public Edge(Node n1, Node n2, int weight) {
         this.n1 = n1;
         this.n2 = n2;
         this.weight = weight;
@@ -52,7 +52,11 @@ public class Edge implements Serializable {
         g.drawLine(xn, yn, x2, y2);
     }
 
-    public void setWeight(double weight) {
+    public void setWeight(int weight) {
         this.weight = weight;
+    }
+
+    public int getWeight() {
+        return weight;
     }
 }

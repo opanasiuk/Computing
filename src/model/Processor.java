@@ -4,12 +4,15 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by Кумпутер on 14.03.2017.
  */
 public class Processor extends Node {
 
+    public List<Processor> child;
     /**
      * Construct a new node.
      *
@@ -20,7 +23,20 @@ public class Processor extends Node {
      */
     public Processor(int n, Point p, int r, Color color) {
         super(n, p, r, color);
+        child = new LinkedList<>();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Processor processor = (Processor) o;
+
+        return this.getN() == ((Processor) o).getN();
+
+    }
+
 
     @Override
     public void draw(Graphics g) {

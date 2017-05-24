@@ -9,6 +9,8 @@ public class Vertex {
     public int from;
     public int length;
 
+    public int taskNumber;
+
     public String text;
 
     public static final int BLOCK_HEIGHT = 20;
@@ -16,10 +18,11 @@ public class Vertex {
 
     public static final int START_POSITION = 50;
 
-    public Vertex(int from, int length, String text) {
+    public Vertex(int from, int length, String text, int taskNumber) {
         this.from = from;
         this.length = length;
         this.text = text;
+        this.taskNumber = taskNumber;
     }
 
     public void draw(Graphics g, int y) {
@@ -29,7 +32,7 @@ public class Vertex {
         g.fillRect(x, y, len, BLOCK_HEIGHT);
         g.setColor(Color.BLACK);
         g.drawRect(x, y, len, BLOCK_HEIGHT);
-        x = x + len/2;
-        g.drawString(text, x, y + BLOCK_HEIGHT/2);
+        x = x + len / 2;
+        g.drawString(text, x, y + BLOCK_HEIGHT / 2);
     }
 }
