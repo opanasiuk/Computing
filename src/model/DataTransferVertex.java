@@ -27,7 +27,16 @@ public class DataTransferVertex extends Vertex {
         g.fillRect(x, y - (layer + 1) * BLOCK_HEIGHT / 2, len, BLOCK_HEIGHT / 2);
         g.setColor(Color.BLACK);
         g.drawRect(x, y - (layer + 1) * BLOCK_HEIGHT / 2, len, BLOCK_HEIGHT / 2);
-        x = x + len / 2;
+        x = x + 5;
         g.drawString(text, x, y - (layer + 1) * BLOCK_HEIGHT / 2 + BLOCK_HEIGHT / 2);
+    }
+
+    @Override
+    public String toString() {
+        return "DataTransferVertex{" +
+                "procFrom=" + procFrom +
+                ", procTo=" + procTo +
+                ", layer=" + layer +
+                '}';
     }
 }

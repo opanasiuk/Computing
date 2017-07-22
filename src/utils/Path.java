@@ -31,6 +31,8 @@ public class Path {
         Arrays.fill(distances, -1);
         getFreeNodes(type).stream().forEach(index ->
                 distances[index] = (type == CriteriaType.TIME_FROM_END
+                        ? nodes.get(index).getWeight()
+                        : type == CriteriaType.ABSOLUTE
                         ? nodes.get(index).getWeight() : 0));
         while (isNotDone(distances)) {
             for (int i = 0; i < graph.length; i++) {
@@ -78,6 +80,14 @@ public class Path {
 
     public List<Integer> getQueue(CriteriaType type) {
         return getQueue0(type).stream().map(pair -> pair.index).collect(Collectors.toList());
+    }
+
+    public int getCriticalPath() {
+        return getQueue0(CriteriaType.ABSOLUTE)
+                .stream()
+                .map(pair -> pair.distance)
+                .max((o1, o2) -> o1 - o2)
+                .get();
     }
 
     public String getStringQueue(CriteriaType type) {
@@ -206,7 +216,8 @@ public class Path {
     public enum CriteriaType {
         NUMBER_OF_NODES,
         TIME_FROM_BEGIN,
-        TIME_FROM_END
+        TIME_FROM_END,
+        ABSOLUTE
     }
 
 }

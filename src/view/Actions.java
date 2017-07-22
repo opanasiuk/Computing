@@ -346,11 +346,32 @@ public class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            ControlPanel pnl = graphPanel.control;
+            String queueAlg = (String) pnl.cmbQueue.getSelectedItem();
+            String modAlg = (String) pnl.cmbAlg.getSelectedItem();
+            Integer links = (Integer) pnl.cmbLinks.getSelectedItem();
+            Path.CriteriaType type = null;
+            switch (queueAlg) {
+                case "Queue alg. 3":
+                    type = Path.CriteriaType.TIME_FROM_END;
+                    break;
+                case "Queue alg. 7":
+                    type = Path.CriteriaType.NUMBER_OF_NODES;
+                    break;
+                case "Queue alg. 16":
+                    type = Path.CriteriaType.TIME_FROM_BEGIN;
+                    break;
+                default:
+                    type = Path.CriteriaType.TIME_FROM_BEGIN;
+                    break;
+            }
+            boolean isAlg1 = modAlg.equals("Alg. 1");
+            Modeling m = new Modeling(graphPanel, sysPanel,
+                    type, links, isAlg1);
             Frame fr = new JFrame("Modeling");
             fr.setSize(DEFAULT_WIDTH + 20, DEFAULT_HEIGHT + 20);
             JPanel gpPanel = new JPanel(new BorderLayout());
-            Modeling m = new Modeling(graphPanel, sysPanel,
-                    Path.CriteriaType.TIME_FROM_BEGIN);
+
             GanttDiagram gd = new GanttDiagram(m);
             fr.add(gpPanel.add(new JScrollPane(gd)));
             fr.setVisible(true);
@@ -370,6 +391,166 @@ public class Actions {
         public void actionPerformed(ActionEvent e) {
             if (Utils.hasFreeNodes(sysPanel)) {
                 JOptionPane.showMessageDialog(sysPanel, "Graph is not linked");
+            }
+        }
+    }
+
+    public static class StatisticsAction extends AbstractAction {
+        private GraphPanel graphPanel;
+        private SystemTopologyPanel sysPanel;
+
+        public StatisticsAction(String name, GraphPanel graphPanel, SystemTopologyPanel sysPanel) {
+            super(name);
+            this.graphPanel = graphPanel;
+            this.sysPanel = sysPanel;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+            JTextField minNumberOfNodes = new JTextField();
+            JTextField maxNumberOfNodes = new JTextField();
+            JTextField stepNumber = new JTextField();
+            JTextField coefFrom = new JTextField();
+            JTextField coefTo = new JTextField();
+            JTextField coefStep = new JTextField();
+            JTextField minWeightTxt = new JTextField();
+            JTextField maxWeightTxt = new JTextField();
+            JTextField graphNumber = new JTextField();
+            final JComponent[] inputs = new JComponent[]{
+                    new JLabel("Min number of nodes"),
+                    minNumberOfNodes,
+                    new JLabel("Max number of nodes"),
+                    maxNumberOfNodes,
+                    new JLabel("Step"),
+                    stepNumber,
+                    new JLabel("Min coefficient"),
+                    coefFrom,
+                    new JLabel("Max coefficient"),
+                    coefTo,
+                    new JLabel("Step coefficient"),
+                    coefStep,
+                    new JLabel("Min weight of node"),
+                    minWeightTxt,
+                    new JLabel("Max weight of node"),
+                    maxWeightTxt,
+                    new JLabel("Task number"),
+                    graphNumber
+            };
+            int result = JOptionPane.showConfirmDialog(graphPanel, inputs, "Statistics ", JOptionPane.PLAIN_MESSAGE);
+            if (result == JOptionPane.OK_OPTION) {
+                int minNumber = minNumberOfNodes.getText().isEmpty()
+                        ? 0 : Integer.parseInt(minNumberOfNodes.getText());
+                int maxNumber = maxNumberOfNodes.getText().isEmpty()
+                        ? 0 : Integer.parseInt(maxNumberOfNodes.getText());
+                int stepN = stepNumber.getText().isEmpty()
+                        ? 0 : Integer.parseInt(stepNumber.getText());
+                double cFr = coefFrom.getText().isEmpty()
+                        ? 0 : Double.parseDouble(coefFrom.getText());
+                double cTo = coefTo.getText().isEmpty()
+                        ? 0 : Double.parseDouble(coefTo.getText());
+                double cStep = coefStep.getText().isEmpty()
+                        ? 0 : Double.parseDouble(coefStep.getText());
+                int minWeigth = minWeightTxt.getText().isEmpty()
+                        ? 0 : Integer.parseInt(minWeightTxt.getText());
+                int maxWeigth = maxWeightTxt.getText().isEmpty()
+                        ? 0 : Integer.parseInt(maxWeightTxt.getText());
+                int numOfGr = graphNumber.getText().isEmpty()
+                        ? 0 : Integer.parseInt(graphNumber.getText());
+                Object[][] stats = new Object[numOfGr + 1][10];
+                int links = (int) graphPanel.control.cmbLinks.getSelectedItem();
+                for (int i = 0; i < numOfGr; i++) {
+                    generate(minNumber, minWeigth, maxWeigth, cFr);
+                    stats[i][0] = minNumber;
+                    stats[i][1] = cFr;
+                    Modeling m = new Modeling(graphPanel, sysPanel,
+                            Path.CriteriaType.TIME_FROM_END, links, true);
+                    stats[i][2] = m.getTimeCalculationOneProc();
+                    stats[i][3] = m.getCriticalPath();
+                    stats[i][4] = m.getTimeCalculation();
+                    m = new Modeling(graphPanel, sysPanel,
+                            Path.CriteriaType.NUMBER_OF_NODES, links, true);
+                    stats[i][5] = m.getTimeCalculation();
+                    m = new Modeling(graphPanel, sysPanel,
+                            Path.CriteriaType.TIME_FROM_BEGIN, links, true);
+                    stats[i][6] = m.getTimeCalculation();
+                    m = new Modeling(graphPanel, sysPanel,
+                            Path.CriteriaType.TIME_FROM_END, links, false);
+                    stats[i][7] = m.getTimeCalculation();
+                    m = new Modeling(graphPanel, sysPanel,
+                            Path.CriteriaType.NUMBER_OF_NODES, links, false);
+                    stats[i][8] = m.getTimeCalculation();
+                    m = new Modeling(graphPanel, sysPanel,
+                            Path.CriteriaType.TIME_FROM_BEGIN, links, false);
+                    stats[i][9] = m.getTimeCalculation();
+                    minNumber += stepN;
+                    cFr += cStep;
+                }
+                for (int i = 4; i < stats[0].length; i++) {
+                    double sum = 0;
+                    for (int j = 0; j < stats.length - 1; j++) {
+                        sum += (double)stats[j][i];
+                    }
+                    stats[numOfGr + 1][i] = sum / (double) numOfGr;
+                }
+                String[] titles = new String[]{"Nodes count", "Coef", "Time 1",
+                        "Alg3-1", "Alg7-1", "Alg17-1", "Alg3-6", "Alg7-6", "Alg16-6"};
+                JTable table = new JTable(stats, titles);
+
+                Frame fr = new JFrame("Modeling");
+                fr.setSize(600, 400);
+
+                fr.add(table);
+                fr.setVisible(true);
+            }
+        }
+
+        private void generate(int numOfNodes, int minWeight, int maxWeight, double coef) {
+            graphPanel.nodes.clear();
+            graphPanel.edges.clear();
+            Random rnd = new Random();
+            int cx = GraphPanel.WIDE / 2;
+            int cy = GraphPanel.HIGH / 2;
+            int r = 180;
+            double angleDiff = 2 * Math.PI / (double) numOfNodes;
+            double angle = 0.0;
+            for (int i = 0; i < numOfNodes; i++) {
+                Point p = new Point((int) (cx + r * Math.sin(angle)), (int) (cy - r * Math.cos(angle)));
+                angle += angleDiff;
+                Node n = new Node(Utils.getFreeNumber(graphPanel.nodes),
+                        p, graphPanel.radius, graphPanel.control.hueIcon.getColor());
+                n.setWeight(rnd.nextInt(maxWeight - minWeight + 1) + minWeight);
+                graphPanel.nodes.add(n);
+            }
+            int k = (int) (graphPanel.nodes.stream().map(Node::getWeight).reduce((n1, n2) -> n1 + n2).get()
+                    * (1.0 / coef - 1.0));
+            Queue<Integer> edgesWeight = new LinkedList<>();
+            while (k > 0) {
+                int t = k > 20 ? k / 4 : k / 2;
+                int rand = t + rnd.nextInt(t + 1);
+                int weight = rand == 0 ? 1 : rand;
+                weight = weight > k ? k : weight;
+                edgesWeight.add(weight);
+                k -= weight;
+            }
+            int executions = 0;
+            while (edgesWeight.size() > 0) {
+                if (++executions > 100000) {
+                    JOptionPane.showMessageDialog(graphPanel, "Cant create graph try one more time!");
+                    return;
+                }
+                Node sourceNode = graphPanel.nodes.get(rnd.nextInt(numOfNodes));
+                Node targetNode = graphPanel.nodes.get(rnd.nextInt(numOfNodes));
+                if (graphPanel.edges.stream().filter(ed -> ed.getN1().equals(sourceNode))
+                        .filter(ed -> ed.getN2().equals(targetNode)).count() > 0 || sourceNode.equals(targetNode)) {
+                    continue;
+                }
+                int weight = edgesWeight.poll();
+                graphPanel.edges.add(new Edge(sourceNode, targetNode, weight));
+                if (Utils.isCyclic(graphPanel)) {
+                    graphPanel.edges.remove(graphPanel.edges.size() - 1);
+                    edgesWeight.add(weight);
+                }
             }
         }
     }

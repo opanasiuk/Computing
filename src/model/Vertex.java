@@ -35,4 +35,14 @@ public class Vertex {
         x = x + len / 2;
         g.drawString(text, x, y + BLOCK_HEIGHT / 2);
     }
+
+    @Override
+    public String toString() {
+        return "Vertex{" +
+                "from=" + from +
+                ", length=" + length +
+                ", taskNumber=" + taskNumber +
+                ", text='" + text + '\'' +
+                '}';
+    }
 }

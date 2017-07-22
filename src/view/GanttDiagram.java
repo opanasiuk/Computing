@@ -60,6 +60,9 @@ public class GanttDiagram extends JComponent {
         int tx = Vertex.START_POSITION + Vertex.MUL_COEF;
         i = 1;
         while(tx <= 1000) {
+            g.setColor(Color.GRAY);
+            g.drawLine(tx, TOP_PAD, tx, startY + Vertex.BLOCK_HEIGHT);
+            g.setColor(Color.BLACK);
             g.drawLine(tx, startY + Vertex.BLOCK_HEIGHT, tx, startY + Vertex.BLOCK_HEIGHT + 4);
             g.drawString("" + i, tx, startY + Vertex.BLOCK_HEIGHT + 15);
             tx += Vertex.MUL_COEF;

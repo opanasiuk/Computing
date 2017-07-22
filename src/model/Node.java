@@ -199,4 +199,12 @@ public class Node implements Serializable {
     public long getTimeSelected() {
         return timeSelected;
     }
+
+    @Override
+    public String toString() {
+        return "Node{" +
+                "n=" + n +
+                ", weight=" + weight +
+                '}';
+    }
 }

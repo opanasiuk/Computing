@@ -11,6 +11,9 @@ public class ControlPanel extends JToolBar {
     public JButton btnNewNode;
     public ColorIcon hueIcon;
     public JPopupMenu popup;
+    public JComboBox cmbQueue;
+    public JComboBox cmbAlg;
+    public JComboBox cmbLinks;
 
     ControlPanel(GraphPanel graphPanel) {
         Action delete = new Actions.DeleteAction("Delete", graphPanel);
@@ -24,6 +27,10 @@ public class ControlPanel extends JToolBar {
         JButton btnConnect = new JButton(connect);
         JButton btnDelete = new JButton(delete);
         hueIcon = new ColorIcon(Color.blue);
+
+        cmbQueue = new JComboBox(new String[]{"Queue alg. 3", "Queue alg. 7", "Queue alg. 16"});
+        cmbAlg = new JComboBox(new String[]{"Alg. 1", "Alg. 6"});
+        cmbLinks = new JComboBox(new Integer[] {1, 2, 3, 4, 5});
 
         btnNewNode.setIcon(new ImageIcon("resources/icons/add_icon.png"));
         btnNewNode.setText(null);
@@ -40,6 +47,8 @@ public class ControlPanel extends JToolBar {
         this.add(btnConnect);
         this.add(btnDelete);
         if (!(graphPanel instanceof SystemTopologyPanel)) {
+
+
             this.addSeparator();
             this.add(new JButton(color));
             this.add(new JLabel(hueIcon));
@@ -54,8 +63,12 @@ public class ControlPanel extends JToolBar {
             this.add(new JLabel("Size:"));
             this.add(js);
             this.add(new JButton(random));
-
+            this.add(cmbQueue);
+            this.add(cmbAlg);
+            this.add(cmbLinks);
             this.add(new JButton(new Actions.ModelingAction("Get Result",
+                    graphPanel, SystemSoftware.stp)));
+            this.add(new JButton(new Actions.StatisticsAction("Statistics",
                     graphPanel, SystemSoftware.stp)));
         } else {
             Action freeNodes = new Actions.FreeNodesAction("FreeNodes", (SystemTopologyPanel) graphPanel);
